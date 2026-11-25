@@ -31,12 +31,16 @@ string getRegister (int address, RegTable registers[], int size) {
     return "Error";
 };
 
-int main() {
+int main(int argc, char** argv) {
+	if (argc < 2) {
+		cout << "ERROR - missing file name\n";
+		return 1;
+	}
    Instructions instr[5] {
         {"add", 0, 32},
         {"addi", 8, 0},
-        {"sub", 0, 22},
-        {"lw", 23, 0}, 
+        {"sub", 0, 34},
+        {"lw", 35, 0}, 
         {"sw", 43, 0}
    };
    RegTable registers[6] {  // There are 6 registers listed not 5
@@ -47,7 +51,7 @@ int main() {
         {"$s0", 16}, 
         {"$s1", 17}
    };
-   ifstream file("test.txt");
+   ifstream file(argv[1]);
    if (!file.is_open()) {
         cout << "Error: Cannot open file." << endl;
         return 1;
@@ -55,30 +59,35 @@ int main() {
    while (!file.eof()) {
         string line;
         while(getline(file, line)) {
-            unsigned int word = stoul(line, nullptr, 16);
-            unsigned int opcode = (word >> 26) & 0x3F;
+            unsigned int num = stoul(line, nullptr, 16);
+            unsigned int opcode = (num >> 26) & 0x3F;
             if (opcode == 0) {
-                unsigned int rs = (word >> 21) & 0x1F;
-                unsigned int rt = (word >> 16) & 0x1F;
-                unsigned int rd = (word >> 11) & 0x1F;
-                unsigned int funcCode = word & 0x3F;
+                unsigned int rs = (num >> 21) & 0x1F;
+                unsigned int rt = (num >> 16) & 0x1F;
+                unsigned int rd = (num >> 11) & 0x1F;
+                unsigned int funcCode = num & 0x3F;
 
-                string opWord = getInstruction(opcode, funcCode, instr, 5);
-                string rsWord = getRegister(rs, registers, 6);
-                string rtWord = getRegister(rt, registers, 6);
-                string rdWord = getRegister(rd, registers, 6);
-                cout << opWord << " " << rsWord << " " << rtWord << " " << rdWord << " ";
+                string opNum = getInstruction(opcode, funcCode, instr, 5);
+                string rsNum = getRegister(rs, registers, 6);
+                string rtNum = getRegister(rt, registers, 6);
+                string rdNum = getRegister(rd, registers, 6);
+                cout << opNum << " " << rdNum << ", " << rsNum << ", " << rtNum;
                 cout << endl;
             }
             else if (opcode == 8 || opcode == 23 || opcode == 43) {
-                unsigned int rs = (word >> 21) & 0x1F;
-                unsigned int rt = (word >> 16) & 0x1F;
-                unsigned int immediate = word & 0xFFFF;
+                unsigned int rs = (num >> 21) & 0x1F;
+                unsigned int rt = (num >> 16) & 0x1F;
+                unsigned int immediate = num & 0xFFFF;
 
-                string opWord = getInstruction(opcode, 0, instr, 5);
-                string rsWord = getRegister(rs, registers, 6);
-                string rtWord = getRegister(rt, registers, 6);
-                cout << opWord << " " << rsWord << " " << rtWord << " " << immediate;
+                string opNum = getInstruction(opcode, 0, instr, 5);
+                string rsNum = getRegister(rs, registers, 6);
+                string rtNum = getRegister(rt, registers, 6);
+                if (opcode == 8) {
+                    cout << opNum << " " << rtNum << ", " << rsNum << ", " << immediate;
+                }
+                else {
+                    cout << opNum << " " << rtNum << ", " << immediate << "(" << rsNum << ")";
+                }
                 cout << endl;
             }
         }
