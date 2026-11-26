@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdint>
 
 using namespace std;
 
@@ -74,10 +75,10 @@ int main(int argc, char** argv) {
                 cout << opNum << " " << rdNum << ", " << rsNum << ", " << rtNum;
                 cout << endl;
             }
-            else if (opcode == 8 || opcode == 23 || opcode == 43) {
+            else if (opcode == 8 || opcode == 35 || opcode == 43) {
                 unsigned int rs = (num >> 21) & 0x1F;
                 unsigned int rt = (num >> 16) & 0x1F;
-                unsigned int immediate = num & 0xFFFF;
+                int immediate = (int16_t)(num & 0xFFFF);
 
                 string opNum = getInstruction(opcode, 0, instr, 5);
                 string rsNum = getRegister(rs, registers, 6);
